@@ -499,7 +499,7 @@ const EditProductModal = ({ product, onClose, onUpdate }) => {
     const errors = {};
     if (!editingProduct.name) errors.name = 'Tên sản phẩm là bắt buộc';
     if (!editingProduct.price) errors.price = 'Giá sản phẩm là bắt buộc';
-    if (!editingProduct.brand_id) errors.brand_id = 'Thương hiệu là bắt buộc';
+    // if (!editingProduct.brand_id) errors.brand_id = 'Thương hiệu là bắt buộc';
     if (!editingProduct.slug) errors.slug = 'Slug là bắt buộc';
     if (!editingProduct.weight) errors.weight = 'Khối lượng sản phẩm là bắt buộc';
     if (!editingProduct.category_id || editingProduct.category_id.length === 0) {
@@ -670,7 +670,7 @@ const EditProductModal = ({ product, onClose, onUpdate }) => {
               </div>
 
               {/* Thương hiệu */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Thương hiệu <span className="text-red-500">*</span>
                 </label>
@@ -690,7 +690,7 @@ const EditProductModal = ({ product, onClose, onUpdate }) => {
                 {formErrors.brand_id && (
                   <p className="mt-1 text-sm text-red-500">{formErrors.brand_id}</p>
                 )}
-              </div>
+              </div> */}
 
               {/* Khối lượng */}
               <div>
@@ -1034,7 +1034,7 @@ const ProductList = () => {
           thumbnail: product.thumbnail || '',
           createdAt: new Date(product.created_at || product.createdAt),
           category_id: product.category_id || [],
-          brand_id: product.brand_id || '',
+          // brand_id: product.brand_id || '',
           category: product.category_id && product.category_id.name ? product.category_id.name : 'Không phân loại'
         }));
 

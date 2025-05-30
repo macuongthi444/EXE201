@@ -94,7 +94,7 @@ const TroocEcommerce = () => {
                 const sortedByDate = [...productsInStock].sort((a, b) =>
                     new Date(b.created_at) - new Date(a.created_at)
                 );
-                setNewProducts(sortedByDate.slice(0, 5));
+                setNewProducts(sortedByDate.slice(0, 4));
                 const featuredProducts = productsInStock.filter(product => product.is_feature);
                 const hotProducts = productsInStock.filter(product => product.is_hot);
                 const sortedBySold = [...productsInStock].sort((a, b) => b.sold - a.sold);
@@ -311,7 +311,7 @@ const TroocEcommerce = () => {
                         </div>
                         <div className="bg-red-500 h-[4px] my-2"></div>
                         <div className="grid grid-cols-4 gap-4 pt-8 px-4">
-                            {recommendedProducts.slice(0, 5).map((product, index) => (
+                            {recommendedProducts.slice(0, 4).map((product, index) => (
                                 <ProductCard
                                     key={product._id}
                                     product={product}
@@ -326,7 +326,7 @@ const TroocEcommerce = () => {
                         </div>
                         {recommendedProducts.length > 5 && (
                             <div className="grid grid-cols-4 gap-4 pt-8">
-                                {recommendedProducts.slice(5, 10).map((product, index) => (
+                                {recommendedProducts.slice(4, 8).map((product, index) => (
                                     <ProductCard
                                         key={product._id}
                                         product={product}
