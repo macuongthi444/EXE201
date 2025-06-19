@@ -88,6 +88,8 @@ async function signIn(req, res, next) {
 
 
         res.status(200).json({
+            firstName: existUser.firstName,
+            lastName: existUser.lastName,
             id: existUser._id,
             email: existUser.email,
             accessToken: token,

@@ -34,6 +34,21 @@ const TroocEcommerce = () => {
   const newProductsRef = useRef(null);
   const recommendedProductsRef = useRef(null);
 
+  const { currentUser, isLoggedIn } = useAuth();
+  const userId = currentUser?.id || currentUser?._id || "";
+
+  // Thêm thông báo khi đăng nhập thành công
+ useEffect(() => {
+    if (isLoggedIn && currentUser) {
+      const fullName = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'Bạn';
+      setAddCartMessage(`Chào mừng ${fullName} đã đăng nhập thành công!`);
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 8000);
+    }
+  }, [isLoggedIn, currentUser]);
+
+  
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -63,9 +78,6 @@ const TroocEcommerce = () => {
     const fileName = imgPath.split("\\").pop();
     return `${BE_API_URL}/Uploads/products/${fileName}`;
   };
-
-  const { currentUser, isLoggedIn } = useAuth();
-  const userId = currentUser?.id || currentUser?._id || "";
 
   useEffect(() => {
     const fetchData = async () => {

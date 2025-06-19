@@ -8,39 +8,23 @@ const LoginPage = () => {
         email: "",
         password: "",
     });
+    const [showPassword, setShowPassword] = useState(false); // Thêm state cho hiển thị mật khẩu
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    
-    // Use auth context
     const { isLoggedIn, login, handleGoogleAuthLogin, userRoles } = useAuth();
 
-    // Function to redirect based on user role - IMPROVED VERSION
+    // Hàm chuyển hướng dựa trên vai trò
     const redirectBasedOnRole = (roles = []) => {
-        console.log("Redirecting based on roles:", roles); // Debug log
-        
-        // Default to home page
+        console.log("Redirecting based on roles:", roles);
         let redirectPath = '/';
-        
-        // Ensure roles is an array
         if (!Array.isArray(roles)) {
             console.error("Roles is not an array:", roles);
             roles = [];
         }
-        
-        // Check for both formats: "ROLE_ADMIN", "ADMIN", etc.
-        const hasAdminRole = roles.some(role => {
-            if (typeof role !== 'string') return false;
-            return role.toUpperCase() === 'ROLE_ADMIN' || role.toUpperCase() === 'ADMIN';
-        });
-        
-        const hasSellerRole = roles.some(role => {
-            if (typeof role !== 'string') return false;
-            return role.toUpperCase() === 'ROLE_SELLER' || role.toUpperCase() === 'SELLER';
-        });
-        
-        // Set redirect path based on role
+        const hasAdminRole = roles.some(role => typeof role === 'string' && (role.toUpperCase() === 'ROLE_ADMIN' || role.toUpperCase() === 'ADMIN'));
+        const hasSellerRole = roles.some(role => typeof role === 'string' && (role.toUpperCase() === 'ROLE_SELLER' || role.toUpperCase() === 'SELLER'));
         if (hasAdminRole) {
             redirectPath = '/admin';
             console.log("Redirecting to admin dashboard");
@@ -50,11 +34,10 @@ const LoginPage = () => {
         } else {
             console.log("Redirecting to home (member role)");
         }
-        
         navigate(redirectPath);
     };
 
-    // Check if user is already logged in and redirect accordingly
+    // Kiểm tra đăng nhập và chuyển hướng
     useEffect(() => {
         if (isLoggedIn && userRoles) {
             console.log("User is already logged in with roles:", userRoles);
@@ -62,7 +45,7 @@ const LoginPage = () => {
         }
     }, [isLoggedIn, userRoles, navigate]);
 
-    // Handle Google auth redirect
+    // Xử lý Google auth redirect
     useEffect(() => {
         const googleAuthData = searchParams.get('googleAuth');
         if (googleAuthData) {
@@ -78,21 +61,19 @@ const LoginPage = () => {
         }));
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError("");
-
         try {
-            // Use context's login function
             const result = await login(formData.email, formData.password);
             console.log("Login successful, result:", result);
-            
-            // Get roles from the result or from context
             const roles = result?.roles || userRoles || [];
             console.log("Roles for redirection:", roles);
-            
-            // Redirect based on user role
             redirectBasedOnRole(roles);
         } catch (error) {
             console.error("Login error:", error);
@@ -102,26 +83,18 @@ const LoginPage = () => {
         }
     };
 
-    // Function to handle Google authentication redirect
     const handleGoogleRedirect = () => {
         window.location.href = `${BE_API_URL}/api/auth/google`;
     };
 
     const processGoogleAuthData = (userDataEncoded) => {
         try {
-            // Decode the user data
             const userData = JSON.parse(decodeURIComponent(userDataEncoded));
             console.log("Google auth data:", userData);
-            
-            // Use the context's function to handle Google auth login
             const success = handleGoogleAuthLogin(userData);
-            
             if (success) {
                 console.log("Google login successful, roles:", userData.roles);
-                
-                // Add a delay before redirect to ensure storage is complete
                 setTimeout(() => {
-                    // Redirect based on user roles from the userData
                     redirectBasedOnRole(userData.roles || []);
                 }, 500);
             } else {
@@ -133,10 +106,8 @@ const LoginPage = () => {
         }
     };
 
-    // The rest of your component remains the same
     return (
         <div className="flex h-screen w-full">
-            {/* Left side with title and plant image */}
             <div className="w-5/12 bg-green-600 flex items-center p-16 relative overflow-hidden">
                 <div className="absolute inset-0 bg-black opacity-20"></div>
                 <div className="relative z-10">
@@ -152,18 +123,14 @@ const LoginPage = () => {
                     className="absolute right-0 bottom-0 w-3/4 h-auto opacity-80"
                 />
             </div>
-
-            {/* Right side with login form */}
             <div className="w-7/12 flex items-center justify-center">
                 <div className="w-full max-w-md px-8">
                     <h2 className="text-3xl font-bold text-green-600 mb-8">Đăng nhập tài khoản</h2>
-
                     {error && (
                         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
                             {error}
                         </div>
                     )}
-
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <div>
                             <label className="block mb-1">
@@ -179,22 +146,38 @@ const LoginPage = () => {
                                 required
                             />
                         </div>
-
                         <div>
                             <label className="block mb-1">
                                 <span className="font-medium">Password <span className="text-red-500">*</span></span>
                             </label>
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="********"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    placeholder="********"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={togglePasswordVisibility}
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                                >
+                                    {showPassword ? (
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    ) : (
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                        </svg>
+                                    )}
+                                </button>
+                            </div>
                         </div>
-
                         <button
                             type="submit"
                             className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition"
@@ -203,7 +186,6 @@ const LoginPage = () => {
                             {loading ? "Đang xử lý..." : "Đăng nhập"}
                         </button>
                     </form>
-
                     <div className="mt-6">
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">
@@ -213,7 +195,6 @@ const LoginPage = () => {
                                 <span className="px-4 bg-white text-gray-500">Hoặc đăng nhập bằng</span>
                             </div>
                         </div>
-
                         <div className="mt-6 flex justify-center">
                             <button
                                 type="button"
@@ -231,7 +212,6 @@ const LoginPage = () => {
                             </button>
                         </div>
                     </div>
-
                     <div className="mt-6 text-center">
                         <a href="/forgot-password" className="text-green-600 hover:underline text-sm">
                             Bạn quên mật khẩu? Click vào đây

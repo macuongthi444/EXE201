@@ -54,22 +54,28 @@ function App() {
     !location.pathname.startsWith('/seller-dashboard/');
 
   // Google Tag Manager script integration
+ // Google Analytics (gtag.js) integration
   useEffect(() => {
-    // Create GTM script
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-TZ2EV99J6D';
-    script.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','G-TZ2EV99J6D');`;
-    
-    document.head.appendChild(script);
+    // Tạo script cho gtag.js
+    const gtagScript = document.createElement('script');
+    gtagScript.async = true;
+    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-M6PEXL46GJ';
+    document.head.appendChild(gtagScript);
 
-    // Cleanup script on component unmount
+    // Tạo script inline cho gtag
+    const inlineScript = document.createElement('script');
+    inlineScript.text = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-M6PEXL46GJ');
+    `;
+    document.head.appendChild(inlineScript);
+
+    // Cleanup cả hai script
     return () => {
-      document.head.removeChild(script);
+      document.head.removeChild(gtagScript);
+      document.head.removeChild(inlineScript);
     };
   }, []);
 
